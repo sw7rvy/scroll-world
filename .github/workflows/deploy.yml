@@ -17,6 +17,10 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # playwright is a devDependency for scripts/shoot.mjs only; the deploy
+      # never drives a browser, so skip its ~150MB browser download.
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
     steps:
       - uses: actions/checkout@v4
 

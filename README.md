@@ -5,7 +5,7 @@ nodes on desktop; a fixed isometric viewport with horizontal section snapping un
 
 **[Live demo →](https://sw7rvy.github.io/scroll-world/)**
 
-![Node 1, exterior entry](docs/01-exterior.png)
+![Node 1, exterior entry](docs/01-entry.png)
 
 ```bash
 npm install
@@ -19,7 +19,7 @@ One camera, no cuts. Scroll moves it along a single spline through all four.
 
 **02 — Platform.** The camera drops over a diorama of the four services on one runtime.
 
-![Node 2, platform diorama](docs/02-platform.png)
+![Node 2, platform diorama](docs/02-diorama.png)
 
 **03 — Architecture.** The camera flies into the module graph. Hovering any module raycasts against
 the `InstancedMesh` and traces its dependencies.
@@ -118,6 +118,33 @@ the page degrades to a plain snapping card deck rather than a blank canvas.
 On desktop, `window.scrollWorld` exposes `{ engine, trajectory, seekNode(i), preview(p), release() }`.
 `preview(0.42)` pins the camera at a progress value while art-directing a beat; `release()` hands
 control back to scroll.
+
+## Screenshots
+
+The README images are generated, not hand-captured. `scripts/shoot.mjs` drives Playwright through
+`window.scrollWorld.preview()`, parks the camera at each node's pose, and writes
+`docs/<NN>-<node id>.png`. It reads the node list from `scroll-world.config.js`, so adding a fifth
+node adds a fifth screenshot with no edit here.
+
+```bash
+npx playwright install chromium   # once
+npm run shoot                     # shoots the live site
+SHOT_URL=http://localhost:5183/ npm run shoot   # or a local preview build
+```
+
+| Variable | Default | Notes |
+| --- | --- | --- |
+| `SHOT_URL` | the live Pages URL | Any origin serving the built app |
+| `SHOT_OUT` | `docs/` | Output directory |
+| `SHOT_WIDTH` / `SHOT_HEIGHT` | `1600` / `900` | Width must exceed `config.breakpoint`, or the page mounts the mobile fallback and the hook is absent |
+| `SHOT_GPU` | unset | `1` runs headed on the real GPU; leave unset for headless SwiftShader, which renders the ground grid slightly flatter |
+
+Nodes marked `interactive` get a pointer sweep first, so node 3 is captured with a module hovered
+and its probe card open. If the module layout moves far enough that the sweep misses, the script
+warns and still shoots.
+
+`playwright` is a devDependency for this script alone. The deploy workflow sets
+`PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` so CI installs the package without its ~150MB of browsers.
 
 ## Deploy
 
