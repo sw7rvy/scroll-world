@@ -98,6 +98,28 @@ On desktop, `window.scrollWorld` exposes `{ engine, trajectory, seekNode(i), pre
 `preview(0.42)` pins the camera at a progress value while art-directing a beat; `release()` hands
 control back to scroll.
 
+## Deploy
+
+`.github/workflows/deploy.yml` builds and publishes to GitHub Pages on every push to `main`
+(or manually via **Actions → Deploy to GitHub Pages → Run workflow**). It runs `npm test` first,
+so a broken camera path fails the deploy instead of shipping.
+
+Pages serves a project site under `/<repo>/`, so the workflow passes the path from
+`actions/configure-pages` into the build:
+
+```yaml
+env:
+  VITE_BASE: ${{ steps.pages.outputs.base_path }}
+```
+
+`vite.config.js` reads `VITE_BASE` and falls back to `/`, so local dev and preview are unaffected.
+To reproduce the deployed build locally:
+
+```bash
+VITE_BASE=/scroll-world npm run build && VITE_BASE=/scroll-world npm run preview
+# then open http://localhost:5183/scroll-world/
+```
+
 ## Note on install location
 
 Keep this project outside Windows AppX-virtualized directories (anything under
