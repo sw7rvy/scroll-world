@@ -11,6 +11,7 @@ const OUT = process.env.SHOT_OUT ?? path.join(here, '..', 'docs')
 const WIDTH = Number(process.env.SHOT_WIDTH) || 1600
 const HEIGHT = Number(process.env.SHOT_HEIGHT) || 900
 const GPU = process.env.SHOT_GPU === '1'
+const MOBILE_NODE = process.env.SHOT_MOBILE_NODE ?? 'diorama'
 
 const SWIFTSHADER = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader']
 
@@ -74,6 +75,37 @@ for (const [i, node] of config.nodes.entries()) {
   await page.screenshot({ path: path.join(OUT, file) })
   console.log(`  ${file}`)
 }
+
+await page.close()
+
+const mobileNode = config.nodes.find(n => n.id === MOBILE_NODE)
+if (!mobileNode) {
+  throw new Error(`SHOT_MOBILE_NODE "${MOBILE_NODE}" is not a node id; expected one of ${config.nodes.map(n => n.id).join(', ')}`)
+}
+
+const mobile = await browser.newPage({
+  viewport: { width: 375, height: 812 },
+  deviceScaleFactor: 2,
+  isMobile: true,
+  hasTouch: true
+})
+mobile.on('pageerror', e => errors.push(String(e)))
+mobile.on('console', m => m.type() === 'error' && errors.push(m.text()))
+
+await mobile.goto(`${URL}#/${mobileNode.id}`, { waitUntil: 'networkidle' })
+await mobile.waitForFunction(
+  () => document.documentElement.dataset.mode === 'mobile' && !document.getElementById('mobile-root').hidden,
+  null,
+  { timeout: 20000 }
+)
+await mobile.waitForSelector('.snap-card')
+await mobile.waitForTimeout(3000)
+
+const landed = await mobile.evaluate(() => document.getElementById('iso-badge').textContent)
+console.log(`  mobile deep link landed on: ${landed}`)
+
+await mobile.screenshot({ path: path.join(OUT, `mobile-${mobileNode.id}.png`) })
+console.log(`  mobile-${mobileNode.id}.png`)
 
 await browser.close()
 

@@ -110,6 +110,12 @@ snapped section's `iso` framing over 650ms.
 Deep links work in this mode: `#/architecture` opens on that section with the camera already framed.
 The hash updates as sections snap.
 
+<img src="docs/mobile-diorama.png" alt="Mobile fallback: fixed isometric stage above a snapping section rail" width="320">
+
+The stage is pinned and the sections scroll horizontally beneath it, so the world stays on screen
+while the copy moves — the closest thing to the desktop flythrough that a phone can afford without
+holding a full 3D scene at 60fps.
+
 If WebGL is unavailable at any width, the same fallback mounts with the isometric stage hidden, so
 the page degrades to a plain snapping card deck rather than a blank canvas.
 
@@ -138,10 +144,15 @@ SHOT_URL=http://localhost:5183/ npm run shoot   # or a local preview build
 | `SHOT_OUT` | `docs/` | Output directory |
 | `SHOT_WIDTH` / `SHOT_HEIGHT` | `1600` / `900` | Width must exceed `config.breakpoint`, or the page mounts the mobile fallback and the hook is absent |
 | `SHOT_GPU` | unset | `1` runs headed on the real GPU; leave unset for headless SwiftShader, which renders the ground grid slightly flatter |
+| `SHOT_MOBILE_NODE` | `diorama` | Which node the 375x812 mobile shot deep-links to |
 
 Nodes marked `interactive` get a pointer sweep first, so node 3 is captured with a module hovered
 and its probe card open. If the module layout moves far enough that the sweep misses, the script
 warns and still shoots.
+
+After the desktop pass it opens a second 375x812 page to capture the mobile fallback, deep-linking
+via `#/<node id>` — that mode has no `scrollWorld` hook, so the hash is the only way to park it on a
+given section.
 
 `playwright` is a devDependency for this script alone. The deploy workflow sets
 `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` so CI installs the package without its ~150MB of browsers.
