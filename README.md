@@ -145,6 +145,31 @@ SHOT_URL=http://localhost:5183/ npm run shoot   # or a local preview build
 | `SHOT_WIDTH` / `SHOT_HEIGHT` | `1600` / `900` | Width must exceed `config.breakpoint`, or the page mounts the mobile fallback and the hook is absent |
 | `SHOT_GPU` | unset | `1` runs headed on the real GPU; leave unset for headless SwiftShader, which renders the ground grid slightly flatter |
 | `SHOT_MOBILE_NODE` | `diorama` | Which node the 375x812 mobile shot deep-links to |
+| `SHOT_CLOCK` | `6` | Scene time the animations are pinned to before capture |
+| `SHOT_DIFF_PEAK` / `SHOT_DIFF_PCT` | `32` / `0.05` | Change-detection thresholds, see below |
+| `SHOT_FORCE` | unset | `1` writes every file regardless of the comparison |
+
+### Why re-shooting doesn't churn the repo
+
+A capture is not byte-reproducible even with the scene fully pinned: Chromium's
+text antialiasing and its dithering of the panels' radial-gradient scrim differ
+between browser sessions. Comparing bytes would rewrite all five PNGs on every
+run for changes no one can see.
+
+So the script compares each new frame against the committed one at 1/8 scale,
+which averages the high-frequency noise away, and only writes when the result
+clears a threshold. Measured on this scene:
+
+| | peak delta | cells over floor |
+| --- | --- | --- |
+| Session noise, nothing changed | 0–17 | 0.00% |
+| Genuine change (`SHOT_CLOCK` 6 → 9) | 61–240 | 0.26–3.35% |
+
+The default peak threshold of 32 sits at the geometric midpoint, roughly 1.9x
+clear in both directions. Two rules are checked — peak amplitude and the share
+of cells clearing half that peak — because a real change can be loud and local
+or quiet and widespread. A no-op re-shoot reports `0 updated` and leaves the
+working tree clean.
 
 Nodes marked `interactive` get a pointer sweep first, so node 3 is captured with a module hovered
 and its probe card open. If the module layout moves far enough that the sweep misses, the script
