@@ -6,6 +6,10 @@ export function createCameraRig({ near, far }, opts = {}) {
   const pos = new Vector3()
   const tgt = new Vector3()
   const lambda = opts.lambda ?? 14
+  // Collapse the tail of the damping to exact equality, the same way
+  // ScrollEngine does. Without it the rig only ever approaches its target, so a
+  // settled camera still differs by a hair between runs.
+  const epsilonSq = (opts.epsilon ?? 1e-4) ** 2
   let fov = 55
   let primed = false
 
@@ -23,11 +27,18 @@ export function createCameraRig({ near, far }, opts = {}) {
       tgt.y = damp(tgt.y, sample.target.y, lambda, dt)
       tgt.z = damp(tgt.z, sample.target.z, lambda, dt)
       fov = damp(fov, sample.fov, lambda, dt)
+
+      if (pos.distanceToSquared(sample.position) < epsilonSq) pos.copy(sample.position)
+      if (tgt.distanceToSquared(sample.target) < epsilonSq) tgt.copy(sample.target)
+      if (Math.abs(fov - sample.fov) < 1e-4) fov = sample.fov
     }
 
     camera.position.copy(pos)
     camera.lookAt(tgt)
-    if (Math.abs(camera.fov - fov) > 0.001) {
+    // Guarding this write on a tolerance leaves camera.fov stalled short of the
+    // target at a frame-timing-dependent value; updateProjectionMatrix is cheap
+    // enough to just write whenever it actually changed.
+    if (camera.fov !== fov) {
       camera.fov = fov
       camera.updateProjectionMatrix()
     }

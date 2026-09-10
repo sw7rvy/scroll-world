@@ -45,13 +45,12 @@ export function createDioramaNode(zone) {
     return { mesh, cap, spec: s }
   })
 
-  let t = 0
   return {
     id: 'diorama',
     group,
     interactive: [],
     update(dt, state) {
-      t += dt
+      const t = state.elapsed
       group.rotation.y = state.progress * 0.8 + Math.sin(t * 0.12) * 0.06
       blocks.forEach((b, i) => {
         const phase = Math.sin(t * 0.9 + i * 1.3)

@@ -47,11 +47,17 @@ function mountDesktop() {
   window.addEventListener('resize', onResize)
 
   window.scrollWorld = {
+    mode: 'desktop',
     engine,
     trajectory,
+    camera: world.camera,
     seekNode: i => engine.scrollToProgress(trajectory.progressForNode(i)),
     preview: p => engine.setOverride(p),
-    release: () => engine.setOverride(null)
+    freezeTime: t => world.freezeTime(t),
+    release: () => {
+      engine.setOverride(null)
+      world.freezeTime(null)
+    }
   }
 
   return () => {

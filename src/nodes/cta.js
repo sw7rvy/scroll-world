@@ -34,13 +34,12 @@ export function createCtaNode(zone) {
   reflect.position.y = 0.02
   group.add(reflect)
 
-  let t = 0
   return {
     id: 'cta',
     group,
     interactive: [],
     update(dt, state) {
-      t += dt
+      const t = state.elapsed
       portal.rotation.z = t * 0.08
       const pulse = 1 + Math.sin(t * 1.4) * 0.015
       portal.scale.setScalar(pulse)

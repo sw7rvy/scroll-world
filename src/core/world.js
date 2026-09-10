@@ -98,12 +98,18 @@ export function createWorld(canvas) {
   resize()
   window.addEventListener('resize', resize)
 
+  let elapsed = 0
+  let frozenAt = null
+
   function render(sample, dt) {
     rig.apply(sample, dt)
+
+    elapsed = frozenAt === null ? elapsed + dt : frozenAt
 
     const activeNode = config.nodes[sample.node]
     nodes.forEach((node, i) => {
       node.update(dt, {
+        elapsed,
         progress: sample.progress,
         localP: i === sample.node ? sample.localP : 0,
         travel: sample.travel,
@@ -132,6 +138,10 @@ export function createWorld(canvas) {
     hoverListener = fn
   }
 
+  function freezeTime(t) {
+    frozenAt = t
+  }
+
   function dispose() {
     window.removeEventListener('resize', resize)
     canvas.removeEventListener('pointermove', onPointerMove)
@@ -147,6 +157,6 @@ export function createWorld(canvas) {
     renderer.dispose()
   }
 
-  return { render, resize, dispose, onHover, camera: rig.camera, scene, renderer }
+  return { render, resize, dispose, onHover, freezeTime, camera: rig.camera, scene, renderer }
 }
 

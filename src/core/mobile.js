@@ -123,6 +123,8 @@ export function mountMobile({ root, canvas, rail, dots, badge, webgl = true }) {
   let tween = 1
   let raf = 0
   let last = performance.now()
+  let elapsed = 0
+  let frozenAt = null
 
   function frameFor(i) {
     const n = config.nodes[i]
@@ -210,9 +212,17 @@ export function mountMobile({ root, canvas, rail, dots, badge, webgl = true }) {
     camera.position.copy(camPos)
     camera.lookAt(camTgt)
 
+    elapsed = frozenAt === null ? elapsed + dt : frozenAt
+
     const span = Math.max(built.length - 1, 1)
     built.forEach((n, i) =>
-      n.update(dt, { progress: index / span, localP: i === index ? 1 : 0, travel: 0, active: i === index })
+      n.update(dt, {
+        elapsed,
+        progress: index / span,
+        localP: i === index ? 1 : 0,
+        travel: 0,
+        active: i === index
+      })
     )
     renderer.render(scene, camera)
   }
@@ -220,9 +230,21 @@ export function mountMobile({ root, canvas, rail, dots, badge, webgl = true }) {
 
   window.addEventListener('resize', applyViewport)
 
+  window.scrollWorld = {
+    mode: 'mobile',
+    seek: i => cards[i]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }),
+    freezeTime: t => {
+      frozenAt = t
+    },
+    release: () => {
+      frozenAt = null
+    }
+  }
+
   return function unmount() {
     cancelAnimationFrame(raf)
     observer.disconnect()
+    delete window.scrollWorld
     window.removeEventListener('resize', applyViewport)
     built.forEach(n => {
       worldRoot.remove(n.group)

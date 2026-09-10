@@ -65,7 +65,12 @@ export function createStoryUI({ story, beacons, onSeek }) {
   function update(sample, panelOpacity) {
     for (const p of panels) {
       const o = panelOpacity(p.index, sample)
-      if (Math.abs(o - p.opacity) < 0.004) continue
+      // Coalesce mid-fade writes, but never skip the endpoints: a pure delta
+      // threshold leaves a panel parked at 0.997 instead of 1, at whatever
+      // value the frame timing happened to land on.
+      const settled = o === 0 || o === 1
+      if (!settled && Math.abs(o - p.opacity) < 0.004) continue
+      if (o === p.opacity) continue
       p.opacity = o
       p.el.style.opacity = o.toFixed(3)
       p.el.style.transform = `translate3d(0, ${((1 - o) * 22).toFixed(2)}px, 0)`

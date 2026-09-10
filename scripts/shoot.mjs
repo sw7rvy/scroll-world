@@ -46,6 +46,11 @@ const renderer = await page.evaluate(() => {
 })
 console.log(`renderer: ${renderer}`)
 
+// Scene animations run off a shared clock. Pinning it makes every capture land
+// on the same frame, so re-shooting only rewrites images that actually changed.
+const CLOCK = Number(process.env.SHOT_CLOCK) || 6
+
+await page.evaluate(t => window.scrollWorld.freezeTime(t), CLOCK)
 await page.waitForTimeout(2500)
 
 for (const [i, node] of config.nodes.entries()) {
@@ -99,6 +104,7 @@ await mobile.waitForFunction(
   { timeout: 20000 }
 )
 await mobile.waitForSelector('.snap-card')
+await mobile.evaluate(t => window.scrollWorld.freezeTime(t), CLOCK)
 await mobile.waitForTimeout(3000)
 
 const landed = await mobile.evaluate(() => document.getElementById('iso-badge').textContent)

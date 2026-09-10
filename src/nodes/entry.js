@@ -3,6 +3,7 @@ import {
   MeshStandardMaterial, Points, PointsMaterial, TorusGeometry
 } from 'three'
 import { palette } from '../scroll-world.config.js'
+import { createRandom } from '../core/math.js'
 
 export function createEntryNode(zone) {
   const group = new Group()
@@ -36,11 +37,12 @@ export function createEntryNode(zone) {
   group.add(halo)
 
   const count = 420
+  const rand = createRandom(0x5c0117)
   const arr = new Float32Array(count * 3)
   for (let i = 0; i < count; i++) {
-    arr[i * 3] = (Math.random() - 0.5) * 90
-    arr[i * 3 + 1] = Math.random() * 34
-    arr[i * 3 + 2] = (Math.random() - 0.5) * 90
+    arr[i * 3] = (rand() - 0.5) * 90
+    arr[i * 3 + 1] = rand() * 34
+    arr[i * 3 + 2] = (rand() - 0.5) * 90
   }
   const motes = new BufferGeometry()
   motes.setAttribute('position', new Float32BufferAttribute(arr, 3))
@@ -50,13 +52,12 @@ export function createEntryNode(zone) {
   )
   group.add(dust)
 
-  let t = 0
   return {
     id: 'entry',
     group,
     interactive: [],
     update(dt, state) {
-      t += dt
+      const t = state.elapsed
       halo.rotation.z = t * 0.15
       halo.scale.setScalar(1 + Math.sin(t * 0.7) * 0.02)
       dust.rotation.y = t * 0.012

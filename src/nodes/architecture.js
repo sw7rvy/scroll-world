@@ -50,7 +50,6 @@ export function createArchitectureNode(zone) {
   const scaleVec = new Vector3()
   const cur = new Color()
   let hovered = -1
-  let t = 0
 
   return {
     id: 'architecture',
@@ -68,7 +67,7 @@ export function createArchitectureNode(zone) {
     },
     hoveredModule: () => (hovered >= 0 ? MODULES[hovered] : null),
     update(dt, state) {
-      t += dt
+      const t = state.elapsed
       lineMat.opacity = 0.3 + (state.active ? state.localP * 0.45 : 0.05)
       MODULES.forEach((m, i) => {
         const bob = Math.sin(t * 0.8 + i) * 0.22
