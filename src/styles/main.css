@@ -274,8 +274,8 @@ html[data-mode="mobile"] #mobile-root {
   scroll-snap-stop: always;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 24px clamp(20px, 7vw, 40px) 32px;
+  justify-content: flex-start;
+  padding: 30px clamp(20px, 7vw, 40px) 28px;
 }
 
 .snap-card__eyebrow {
