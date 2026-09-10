@@ -3,11 +3,32 @@
 Single-camera, scroll-driven flythrough landing page. One continuous WebGL shot across four story
 nodes on desktop; a fixed isometric viewport with horizontal section snapping under 768px.
 
+**[Live demo →](https://sw7rvy.github.io/scroll-world/)**
+
+![Node 1, exterior entry](docs/01-exterior.png)
+
 ```bash
 npm install
 npm run dev      # http://localhost:5183
 npm test         # trajectory regression check
 ```
+
+## The four beats
+
+One camera, no cuts. Scroll moves it along a single spline through all four.
+
+**02 — Platform.** The camera drops over a diorama of the four services on one runtime.
+
+![Node 2, platform diorama](docs/02-platform.png)
+
+**03 — Architecture.** The camera flies into the module graph. Hovering any module raycasts against
+the `InstancedMesh` and traces its dependencies.
+
+![Node 3, interactive architecture graph](docs/03-architecture.png)
+
+**04 — Next.** The path ends inside the portal, with the copy framed by the ring.
+
+![Node 4, call to action](docs/04-cta.png)
 
 ## Architecture
 
