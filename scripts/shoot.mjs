@@ -10,7 +10,12 @@ const URL = process.env.SHOT_URL ?? 'https://sw7rvy.github.io/scroll-world/'
 const OUT = process.env.SHOT_OUT ?? path.join(here, '..', 'docs')
 const WIDTH = Number(process.env.SHOT_WIDTH) || 1600
 const HEIGHT = Number(process.env.SHOT_HEIGHT) || 900
+// GPU vs software is decided by the ANGLE backend, not by headed mode: the
+// headless shell reaches D3D11 just fine. Headed is a separate switch, and on
+// some machines the full (non-shell) Chromium build will not start at all.
 const GPU = process.env.SHOT_GPU === '1'
+const HEADED = process.env.SHOT_HEADED === '1'
+const CHANNEL = process.env.SHOT_CHANNEL || undefined
 const MOBILE_NODE = process.env.SHOT_MOBILE_NODE ?? 'diorama'
 const FORCE = process.env.SHOT_FORCE === '1'
 
@@ -33,7 +38,8 @@ const SWIFTSHADER = ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsa
 mkdirSync(OUT, { recursive: true })
 
 const browser = await chromium.launch({
-  headless: !GPU,
+  headless: !HEADED,
+  channel: CHANNEL,
   args: ['--hide-scrollbars', ...(GPU ? ['--use-angle=d3d11'] : SWIFTSHADER)]
 })
 

@@ -134,16 +134,22 @@ node adds a fifth screenshot with no edit here.
 
 ```bash
 npx playwright install chromium   # once
-npm run shoot                     # shoots the live site
-SHOT_URL=http://localhost:5183/ npm run shoot   # or a local preview build
+SHOT_GPU=1 npm run shoot          # shoots the live site
+SHOT_GPU=1 SHOT_URL=http://localhost:5183/ npm run shoot   # or a local preview build
 ```
+
+The committed images are GPU renders. Software rendering is the default because
+it needs nothing from the host, but it loses most of the ground grid at grazing
+angles — pass `SHOT_GPU=1` when regenerating so the plates match.
 
 | Variable | Default | Notes |
 | --- | --- | --- |
 | `SHOT_URL` | the live Pages URL | Any origin serving the built app |
 | `SHOT_OUT` | `docs/` | Output directory |
 | `SHOT_WIDTH` / `SHOT_HEIGHT` | `1600` / `900` | Width must exceed `config.breakpoint`, or the page mounts the mobile fallback and the hook is absent |
-| `SHOT_GPU` | unset | `1` runs headed on the real GPU; leave unset for headless SwiftShader, which renders the ground grid slightly flatter |
+| `SHOT_GPU` | unset | `1` renders on the real GPU (ANGLE/D3D11). Headless reaches hardware fine — this is a backend switch, not a headed one |
+| `SHOT_HEADED` | unset | `1` opens a visible window. Rarely needed, and the full Chromium build fails to start on some machines |
+| `SHOT_CHANNEL` | unset | e.g. `msedge`, to drive an installed browser instead of Playwright's |
 | `SHOT_MOBILE_NODE` | `diorama` | Which node the 375x812 mobile shot deep-links to |
 | `SHOT_CLOCK` | `6` | Scene time the animations are pinned to before capture |
 | `SHOT_DIFF_PEAK` / `SHOT_DIFF_PCT` | `32` / `0.05` | Change-detection thresholds, see below |
