@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en" data-mode="desktop">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Scroll World</title>
+<link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+<canvas id="world-canvas"></canvas>
+<div id="story" aria-live="polite"></div>
+<nav id="beacons" aria-label="Scene navigation"></nav>
+<div id="scroll-track"></div>
+<main id="mobile-root" hidden>
+  <div id="iso-stage"><canvas id="iso-canvas"></canvas><div id="iso-badge"></div></div>
+  <div id="snap-rail"></div>
+  <div id="snap-dots"></div>
+</main>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

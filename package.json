@@ -1,0 +1,19 @@
+{
+  "name": "scroll-world",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node scripts/verify-trajectory.mjs"
+  },
+  "dependencies": {
+    "lenis": "^1.1.20",
+    "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.10"
+  }
+}
